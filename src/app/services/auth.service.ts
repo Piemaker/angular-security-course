@@ -35,4 +35,10 @@ export class AuthService {
       tap((user) => this.subject.next(user))
     );
   }
+
+  logout() {
+    return this.http
+      .post("/api/logout", {})
+      .pipe(tap(() => this.subject.next(ANONYMOUS_USER)));
+  }
 }
