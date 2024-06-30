@@ -26,3 +26,7 @@ export const createSessionToken = async (userId: string) => {
     subject: userId,
   });
 };
+
+export const decodeJwt = async (token: string) => {
+    return jwt.verify(token, RSA_PUBLIC_KEY)
+};
