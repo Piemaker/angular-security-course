@@ -1,20 +1,13 @@
+import { Request, Response } from "express";
+import { db } from "./database";
 
+export function getUser(req: Request, res: Response) {
+  const user = db.findUserById(req["userId"]);
 
-import {Request, Response} from "express";
-
-
-
-export function getUser(req:Request, res:Response) {
-
-    //TODO retrieve the actual user based on JWT content
-    const user = {
-        email:'test@gmail.com'
-    };
-
-    if (user) {
-        res.status(200).json(user);
-    }
-    else {
-        res.sendStatus(204);
-    }
+  if (user) {
+    console.log("🚀 ~ getUser ~ user:", user);
+    res.status(200).json({ id: user.id, email: user.email });
+  } else {
+    res.sendStatus(204);
+  }
 }

@@ -7,12 +7,14 @@ import { createUser } from "./create-user.route";
 import { getUser } from "./get-user.route";
 import { logout } from "./logout.route";
 import { login } from "./login.route";
+import { getUserId } from "./get-userId.middleware";
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
 const app: Application = express();
-app.use(getUser);
 app.use(cookieParser());
+// order matter, cookie won't be stored
+app.use(getUserId);
 app.use(bodyParser.json());
 
 const commandLineArgs = require("command-line-args");

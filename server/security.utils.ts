@@ -16,17 +16,15 @@ const SESSION_DURATION = 240;
 
 const ALGORITHM = "RS256";
 
-const DURATION = 120;
-
 export const createSessionToken = async (userId: string) => {
   const payload = {};
   return signJwt(payload, RSA_PRIVATE_KEY, {
     algorithm: ALGORITHM,
-    expiresIn: DURATION,
+    expiresIn: SESSION_DURATION,
     subject: userId,
   });
 };
 
 export const decodeJwt = async (token: string) => {
-    return jwt.verify(token, RSA_PUBLIC_KEY)
+  return jwt.verify(token, RSA_PUBLIC_KEY);
 };

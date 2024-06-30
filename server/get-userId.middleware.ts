@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { decodeJwt } from "./security.utils";
 
-export async function getUserId(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export function getUserId(req: Request, res: Response, next: NextFunction) {
   const token = req.cookies["SESSIONID"];
 
   if (token) {
@@ -14,10 +10,13 @@ export async function getUserId(
         next();
       })
       .catch((err) => {
-        console.log("🚀 ~ handleSessionCookie ~ err:", err);
+        console.log("🚀 ~ handleSessionCookie ~ err:", err.message);
         next();
       });
+  } else {
+    next();
   }
+  // will block the request if there is no token
 }
 
 async function handleSessionCookie(jwt: string, req: Request) {
@@ -25,6 +24,6 @@ async function handleSessionCookie(jwt: string, req: Request) {
     const payload = await decodeJwt(jwt);
     req["userId"] = payload.sub;
   } catch (err) {
-    console.log("🚀 ~ handleSessionCookie ~ err:", err);
+    console.log("🚀 ~ handleSessionCookie ~ err:", err.message);
   }
 }
