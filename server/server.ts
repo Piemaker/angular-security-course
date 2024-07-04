@@ -9,6 +9,7 @@ import { logout } from "./logout.route";
 import { login } from "./login.route";
 import { getUserId } from "./get-userId.middleware";
 import { checkIfAuthenticated } from "./auth.middleware";
+import { checkCsrfToken } from "./checkCsrfToken.middleware";
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
@@ -33,7 +34,10 @@ app.route("/api/signup").post(createUser);
 
 app.route("/api/user").get(getUser);
 
-app.route("/api/logout").post(logout);
+// You have to add the checkIfAuthenticated before the checkCsrfToken to ensure that an attacker sending the header == cookie
+// from their rest client isn't able to bypass the security  because they don't have a valid session cookie
+
+app.route("/api/logout").post(checkIfAuthenticated, checkCsrfToken, logout);
 
 app.route("/api/login").post(login);
 

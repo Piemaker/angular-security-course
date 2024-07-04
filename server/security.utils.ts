@@ -3,6 +3,7 @@ const util = require("util");
 const crypto = require("crypto");
 import * as jwt from "jsonwebtoken";
 import * as fs from "fs";
+import * as argon2 from "argon2";
 
 export const randomBytes = util.promisify(crypto.randomBytes);
 
@@ -27,4 +28,8 @@ export const createSessionToken = async (userId: string) => {
 
 export const decodeJwt = async (token: string) => {
   return jwt.verify(token, RSA_PUBLIC_KEY);
+};
+
+export const createCsrToken = (sessionToken: string) => {
+  return argon2.hash(sessionToken);
 };
