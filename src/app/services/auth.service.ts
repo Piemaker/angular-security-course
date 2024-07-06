@@ -1,4 +1,4 @@
-import { filter } from "rxjs/operators";
+import { filter, shareReplay } from "rxjs/operators";
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, BehaviorSubject } from "rxjs";
@@ -6,6 +6,7 @@ import { User } from "../model/user";
 import * as auth0 from "auth0-js";
 import { Router } from "@angular/router";
 import moment from "moment";
+import { tap } from "lodash";
 
 export const ANONYMOUS_USER: User = {
   id: undefined,
@@ -24,6 +25,7 @@ export class AuthService {
     domain: AUTH_CONFIG.domain,
     responseType: "token id_token",
     redirectUri: "https://localhost:4200/lessons",
+    scope: "openid email",
   });
 
   private userSubject = new BehaviorSubject<User>(undefined);
@@ -32,14 +34,28 @@ export class AuthService {
     .asObservable()
     .pipe(filter((user) => !!user));
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {
+    if (this.isLoggedIn()) {
+      this.userInfo();
+    }
+  }
+
+  userInfo() {
+    this.http
+      .put<User>("/api/userinfo", null)
+      .pipe(
+        shareReplay(),
+        tap((user) => this.userSubject.next(user))
+      )
+      .subscribe();
+  }
 
   login() {
-    this.auth0.authorize();
+    this.auth0.authorize({ initialScreen: "login" });
   }
 
   signUp() {
-    this.auth0.signup();
+    this.auth0.authorize({ initialScreen: "signup" });
   }
 
   logout() {

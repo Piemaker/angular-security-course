@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import * as fs from "fs";
 import * as https from "https";
 import { readAllLessons } from "./read-all-lessons.route";
+import { userInfo } from "os";
 // this fetches the public keys from the auth0 endpoint (advantage of not stopping the server to reload a new public key)
 const jwksRsa = require("jwks-rsa");
 // this configures the jwt from auth0
@@ -39,6 +40,8 @@ app.use((err, req, res, next) => {
   }
 });
 // REST API
+app.route("/api/userinfo").get(userInfo);
+
 app.route("/api/lessons").get(readAllLessons);
 
 if (options.secure) {
