@@ -1,94 +1,83 @@
-
-import * as _ from 'lodash';
-import {LESSONS, USERS} from "./database-data";
-import {DbUser} from "./db-user";
-
+import * as _ from "lodash-es";
+import { LESSONS, USERS } from "./database-data";
+import { DbUser } from "./db-user";
 
 class InMemoryDatabase {
+  userCounter = 0;
 
-    userCounter = 0;
+  readAllLessons() {
+    return _.values(LESSONS);
+  }
 
-    readAllLessons() {
-        return _.values(LESSONS);
+  createUser(email: string, authenticationId) {
+    const usersPerEmail = _.keyBy(_.values(USERS), "email");
+
+    if (usersPerEmail[email]) {
+      const message = "An user already exists with email " + email;
+      console.error(message);
+      throw new Error(message);
     }
 
-    createUser(email:string, authenticationId) {
+    this.userCounter++;
 
-        const usersPerEmail = _.keyBy( _.values(USERS), "email" );
+    const id = this.userCounter;
 
-        if (usersPerEmail[email]) {
-            const message = "An user already exists with email " + email;
-            console.error(message);
-            throw new Error(message);
-        }
+    const user: DbUser = {
+      id,
+      email,
+      authenticationId,
+    };
 
-        this.userCounter++;
+    USERS[id] = user;
 
-        const id = this.userCounter;
+    console.log(USERS);
 
-        const user: DbUser = {
-            id,
-            email,
-            authenticationId
-        };
+    return user;
+  }
 
-        USERS[id] = user;
+  findUserByEmail(email: string): DbUser {
+    const users = _.values(USERS);
 
-        console.log(USERS);
+    return _.find(users, (user) => user.email === email);
+  }
 
-        return user;
+  findUserById(userId: string): DbUser {
+    let user = undefined;
+
+    if (userId) {
+      console.log("looking for userId ", userId);
+
+      const users = _.values(USERS);
+
+      user = _.find(users, (user) => user.id.toString() === userId);
+
+      console.log("user data found:", user);
     }
 
+    return user;
+  }
 
-    findUserByEmail(email:string) :DbUser {
+  findUserByAuthenticationId(authenticationId: string) {
+    let user = undefined;
 
-        const users = _.values(USERS);
+    if (authenticationId) {
+      console.log(
+        "looking for user with authenticationId = ",
+        authenticationId
+      );
 
-        return _.find(users, user => user.email === email);
+      const users = _.values(USERS);
+
+      user = _.find(
+        users,
+        (user) => user.authenticationId === authenticationId
+      );
+
+      console.log("user data found:", user);
     }
 
-    findUserById(userId:string) :DbUser {
-
-        let user = undefined;
-
-        if (userId) {
-
-            console.log("looking for userId ", userId);
-
-            const users = _.values(USERS);
-
-            user = _.find(users, user => user.id.toString() === userId);
-
-            console.log("user data found:", user);
-        }
-
-        return user;
-
-    }
-
-
-    findUserByAuthenticationId(authenticationId:string) {
-        let user = undefined;
-
-        if (authenticationId) {
-
-            console.log("looking for user with authenticationId = ", authenticationId);
-
-            const users = _.values(USERS);
-
-            user = _.find(users, user => user.authenticationId === authenticationId);
-
-            console.log("user data found:", user);
-        }
-
-        return user;
-    }
-
+    return user;
+  }
 }
 
-
-
-
 export const db = new InMemoryDatabase();
-
-
